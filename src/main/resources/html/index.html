@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="indexService.js"></script>
+
+<head>
+    <meta charset="utf-8">
+    <title>
+
+    </title>
+</head>
+<body>
+<input id="deployProcess" value="" />部署流程
+<br/><br/>
+<button onclick="queryAllProcess()">查看所有流程</button>
+
+<table border="1" cellspacing="0" cellpadding="0" class="table table-striped col-md-10" id ="processTable" >
+    <thead>
+    <tr>
+        <th scope="col">id&nbsp&nbsp&nbsp&nbsp&nbsp</th>
+        <th scope="col" >name</th>
+    </tr>
+    </thead>
+<!--    <tbody>-->
+<!--    <tr>-->
+<!--        <th scope="col">id</th>-->
+<!--        <th scope="col">name</th>-->
+<!--    </tr>-->
+<!--    </tbody>-->
+</table>
+</br>
+<table border="1" cellspacing="0" cellpadding="0" class="table table-striped col-md-10" id ="taskTable" >
+</table>
+
+</br>
+<input type="text" id="assignee"><button onclick="queryTask()">查看代理人流程</button>
+</body>
+</html>

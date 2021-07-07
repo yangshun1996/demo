@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+        <input id="name">用户名
+        <input id="pwd">密码
+</br>
+        <button onclick="login()">登录</button>
+
+</br></br></br></br></br>
+
+
+        <table border="1" cellspacing="0" cellpadding="0" class="table table-striped col-md-10" id ="listTable" >
+
+        </table>
+
+        <table border="1" cellspacing="0" cellpadding="0" class="table table-striped col-md-10" id ="agreeTable" >
+
+        </table>
+
+        <table border="1" cellspacing="0" cellpadding="0" class="table table-striped col-md-10" id ="queryTable" >
+
+        </table>
+</body>
+<script>
+
+
+    function login() {
+        var name = $("#name").val();
+        var name3 ="'"  + $("#name").val() +"'";
+        var pwd = $("#pwd").val();
+        $.ajax({
+            type: "POST",
+            data: {name:name , pwd:pwd},
+            url: "http://localhost:9999/user/login",
+            dataType: "json",
+            success: function (data){
+                var tableBody = "";
+                for ( var i = 0 ; i < data.length ; i ++){
+                    var name2 = "'" + data[i].name +"'";
+                    var url = "'" + data[i].url +"'";
+                    tableBody = tableBody + "    <tbody>\n" +
+                        "    <tr>\n" +
+                        "    <th scope=\"col\" onclick=\"queryList(" + url +" ," + name3 + ")\"> " + data[i].name + "</th>" +
+                        "    </tr>\n" +
+                        "    </tbody>"
+                }
+                tableBody = tableBody + "</table>";
+                $('#listTable').html(tableBody);
+            },
+            error: function(data){
+                    alert("失败")
+            },
+        });
+    }
+
+    function queryList(sel,userName) {
+        if("apply" == sel){
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:9999/user/apply",
+                    data:{name : userName},
+                dataType: "json",
+                error: function (data){
+                    alert("ok");
+                    queryList("query" , userName);
+                },
+            });
+        }
+        if("agree" == sel){
+            $.ajax({
+                type: "POST",
+                data: {assignee:"B"},
+                url: "http://localhost:9999/act/queryTask",
+                dataType: "json",
+                success: function(data){
+                    var tableBody = "";
+                    for ( var i = 0 ; i < data.length ; i ++){
+                        var id = "'" + data[i].taskId +"'";
+                        var name = "'" + data[i].taskName +"'";
+                        var createTime = "'" + data[i].createTime +"'";
+                        tableBody = tableBody + "    <tbody>\n" +
+                            "    <tr>\n" +
+                            "        <th scope=\"col\">" + id + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            "        <th scope=\"col\">" + name + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            "        <th scope=\"col\">" + createTime + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            "         <th scope=\"col\" onclick=\"pass(" + id +")\">通过</th>" +
+                            "    </tr>\n" +
+                            "    </tbody>"
+                    }
+                    tableBody = tableBody + "</table>";
+                    $('#agreeTable').html(tableBody);
+                },
+            });
+        }
+        if("query" == sel){
+            $.ajax({
+                type: "POST",
+                data: {assignee:"B" , user : userName},
+                url: "http://localhost:9999/act/queryTask2",
+                dataType: "json",
+                success: function(data){
+                    var tableBody = "";
+                    for ( var i = 0 ; i < data.length ; i ++){
+                        var id =  data[i].taskId ;
+                        var status =  data[i].status;
+                        var time =  data[i].time;
+                        tableBody = tableBody + "    <tbody>\n" +
+                            "    <tr>\n" +
+                                "        <th scope=\"col\">" + id + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            "        <th scope=\"col\">" + time + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            "        <th scope=\"col\">" + (status == 1 ? '未通过' : '通过') + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            // "         <th scope=\"col\" onclick=\"pass(" + id +")\">通过</th>" +
+                            "    </tr>\n" +
+                            "    </tbody>"
+                    }
+                    tableBody = tableBody + "</table>";
+                    $('#queryTable').html(tableBody);
+                },
+            });
+        }
+    }
+
+    function pass(sel) {
+        $.ajax({
+            type: "POST",
+            data: {taskId:sel},
+            url: "http://localhost:9999/act/completePersonalTask",
+            dataType: "json",
+            error: function(data){
+                queryList("agree");
+            },
+        });
+    }
+</script>
+</body>
+</html>

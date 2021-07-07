@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.UserMapper">
+        <select id="queryUser" resultType="java.lang.Integer">
+                SELECT
+                *
+            FROM
+            USER
+            WHERE
+                NAME = #{name}
+                AND PWD = #{pwd}
+        </select>
+
+    <select id="queryLastTaskId" resultType="java.lang.Integer">
+        SELECT
+	EXECUTION_ID_
+FROM
+	`act_ru_task`
+ORDER BY
+	CREATE_TIME_ DESC
+	LIMIT 1
+    </select>
+
+    <insert id="insertTaskHis">
+            INSERT INTO
+user_task_rel
+(TASKID , USERID )
+VALUE (#{taskId} , #{userId})
+    </insert>
+
+    <select id="queryTaskHis" resultType="com.example.demo.dao.TaskInfo">
+   SELECT
+	utl.TASKID,
+	utl.STATUS,
+	aht.START_TIME_ Time
+FROM
+	`user_task_rel` utl
+	LEFT JOIN act_hi_taskinst aht ON utl.TASKID = aht.EXECUTION_ID_
+	LEFT JOIN `user` u ON u.ID = utl.USERID
+	WHERE u.`NAME` = #{name}
+		AND aht.ASSIGNEE_ = "A"
+    </select>
+
+    <select id="queryTaskId" resultType="java.lang.Integer">
+        SELECT EXECUTION_ID_ FROM `act_ru_task`
+WHERE ID_ = #{id}
+    </select>
+
+    <update id="updateState">
+        UPDATE user_task_rel
+        SET STATUS = 2
+        WHERE TASKID = #{id};
+    </update>
+</mapper>
