@@ -82,13 +82,16 @@
                     for ( var i = 0 ; i < data.length ; i ++){
                         var id = "'" + data[i].taskId +"'";
                         var name = "'" + data[i].taskName +"'";
+                        var userName = "'" + data[i].userName +"'";
                         var createTime = "'" + data[i].createTime +"'";
                         tableBody = tableBody + "    <tbody>\n" +
                             "    <tr>\n" +
                             "        <th scope=\"col\">" + id + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
                             "        <th scope=\"col\">" + name + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            "        <th scope=\"col\">" + userName + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
                             "        <th scope=\"col\">" + createTime + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
                             "         <th scope=\"col\" onclick=\"pass(" + id +")\">通过</th>" +
+                            "         <th scope=\"col\" onclick=\"reject(" + id +")\">驳回</th>" +
                             "    </tr>\n" +
                             "    </tbody>"
                     }
@@ -109,11 +112,14 @@
                         var id =  data[i].taskId ;
                         var status =  data[i].status;
                         var time =  data[i].time;
+                        var uName = "'" + userName + "'";
+                        var str = status == 3 ? "<th scope=\"col\" onclick=\"reApply('" + id +"'," + uName +")\">重新申请</th>"   : "";
                         tableBody = tableBody + "    <tbody>\n" +
                             "    <tr>\n" +
                                 "        <th scope=\"col\">" + id + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
                             "        <th scope=\"col\">" + time + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
-                            "        <th scope=\"col\">" + (status == 1 ? '未通过' : '通过') + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                            "        <th scope=\"col\">" + (status == 1 ? '未通过' : status == 2 ? '通过' : status == 3 ? '驳回' : '') + "&nbsp&nbsp&nbsp&nbsp&nbsp</th>\n" +
+                                str +
                             // "         <th scope=\"col\" onclick=\"pass(" + id +")\">通过</th>" +
                             "    </tr>\n" +
                             "    </tbody>"
@@ -128,13 +134,37 @@
     function pass(sel) {
         $.ajax({
             type: "POST",
-            data: {taskId:sel},
-            url: "http://localhost:9999/act/completePersonalTask",
+            data: {taskId:sel , pass:50},
+            url: "http://localhost:9999/act/reject",
             dataType: "json",
             error: function(data){
                 queryList("agree");
             },
         });
+    }
+
+    function reject(sel) {
+            $.ajax({
+                    type: "POST",
+                    data: {taskId:sel , pass:200},
+                    url: "http://localhost:9999/act/reject",
+                    dataType: "json",
+                    error: function(data){
+                            queryList("agree");
+                    },
+            });
+    }
+
+    function reApply(sel , userName) {
+            $.ajax({
+                    type: "POST",
+                    data: {taskId:sel },
+                    url: "http://localhost:9999/act/reApply",
+                    dataType: "json",
+                    error: function(data){
+                            queryList("query" , userName);
+                    },
+            });
     }
 </script>
 </body>

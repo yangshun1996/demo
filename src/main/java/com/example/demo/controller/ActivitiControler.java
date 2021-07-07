@@ -51,17 +51,28 @@ public class ActivitiControler {
         builder.deploy();
         return "ok";
     }
-    @ApiOperation(value = "驳回", httpMethod = "POST", response = String.class, notes = "驳回")
+    @ApiOperation(value = "排他网关", httpMethod = "POST", response = String.class, notes = "排他网关")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="taskId", value="accountCode", dataType="String", paramType="query", required=true),
+            @ApiImplicitParam(name="taskId", value="taskId", dataType="String", paramType="query", required=true),
+            @ApiImplicitParam(name="pass", value="pass", dataType="String", paramType="query", required=true),
     })
     @RequestMapping("/reject")
     public String reject(
-            @RequestParam(value = "taskId", defaultValue = "")String taskId
+            @RequestParam(value = "taskId", defaultValue = "")String taskId,
+            @RequestParam(value = "pass", defaultValue = "")String pass
     ){
+        Integer integer = mapper.queryTaskId(Integer.valueOf(taskId));
+        int status = 0 ;
+        if(integer.valueOf(pass) >= 100){
+            status = 3;
+        }else {
+            status = 2;
+        }
+        mapper.updateState(integer , status);
+
         Map<String, Object> paramMap = new HashMap<String, Object>();
         //设置流程变量day=3
-        paramMap.put("a",  200   );
+        paramMap.put("a",  pass  );
 
 
         ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
@@ -134,8 +145,10 @@ public class ActivitiControler {
                     ",taskName:" + task.getName() +
                     ",assignee:" + task.getAssignee() +
                     ",createTime:" + task.getCreateTime());
+            String name = mapper.queryUserNameById(Integer.valueOf(task.getId()));
             HashMap<String, Object> map = new HashMap<String, Object>();
             map.put("taskId",task.getId());
+            map.put("userName",name);
             map.put("taskName",task.getName());
             map.put("assignee",task.getAssignee());
             map.put("createTime",task.getCreateTime());
@@ -170,7 +183,7 @@ public class ActivitiControler {
 
 
         Integer integer = mapper.queryTaskId(Integer.valueOf(taskId));
-        mapper.updateState(integer);
+        mapper.updateState(integer , 2);
 
         Constant.processEngine.getTaskService()
                 .complete(taskId);
@@ -238,6 +251,20 @@ public class ActivitiControler {
         }
     }
 
+    @ApiOperation(value = "重新申请", httpMethod = "POST", response = Object.class, notes = "重新申请")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="taskId", value="processId", dataType="String", paramType="query", required=true),
+    })
+    @RequestMapping("/reApply")
+    public String reApply(
+            @RequestParam(value = "taskId", defaultValue = "")String taskId
+    ){
+        Integer Id = mapper.queryId(Integer.valueOf(taskId));
+        mapper.updateState(Integer.valueOf(taskId) , 1);
 
+        Constant.processEngine.getTaskService()
+                .complete(Id.toString());
+        return "ok";
+    }
 
 }

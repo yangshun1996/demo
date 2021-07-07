@@ -29,16 +29,16 @@ VALUE (#{taskId} , #{userId})
     </insert>
 
     <select id="queryTaskHis" resultType="com.example.demo.dao.TaskInfo">
-   SELECT
+  SELECT
 	utl.TASKID,
 	utl.STATUS,
-	aht.START_TIME_ Time
+	utl.CREATETIME Time
 FROM
 	`user_task_rel` utl
-	LEFT JOIN act_hi_taskinst aht ON utl.TASKID = aht.EXECUTION_ID_
+	LEFT JOIN act_ru_task aht ON utl.TASKID = aht.EXECUTION_ID_
 	LEFT JOIN `user` u ON u.ID = utl.USERID
-	WHERE u.`NAME` = #{name}
-		AND aht.ASSIGNEE_ = "A"
+WHERE
+	u.`NAME` =#{name}
     </select>
 
     <select id="queryTaskId" resultType="java.lang.Integer">
@@ -46,9 +46,27 @@ FROM
 WHERE ID_ = #{id}
     </select>
 
+    <select id="queryId" resultType="java.lang.Integer">
+        SELECT ID_ FROM `act_ru_task`
+WHERE EXECUTION_ID_ = #{id}
+    </select>
+
+
+
     <update id="updateState">
         UPDATE user_task_rel
-        SET STATUS = 2
+        SET STATUS = #{status}
         WHERE TASKID = #{id};
     </update>
+
+    <select id="queryUserNameById" resultType="java.lang.String">
+SELECT
+	u.`NAME`
+FROM
+	`act_ru_task` art
+	INNER JOIN user_task_rel utr ON art.EXECUTION_ID_ = utr.TASKID
+	INNER JOIN user u ON u.ID = utr.USERID
+	WHERE art.ID_ = #{id}
+
+    </select>
 </mapper>

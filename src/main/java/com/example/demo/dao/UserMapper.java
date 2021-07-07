@@ -18,5 +18,9 @@ public interface UserMapper {
     List<TaskInfo> queryTaskHis (@Param("name")String name);
     Integer queryTaskId (@Param("id") Integer id);
 
-    void updateState(@Param("id") Integer id);
+    Integer queryId (@Param("id") Integer id);
+
+    void updateState(@Param("id") Integer id , @Param("status") Integer status);
+
+    String queryUserNameById (@Param("id") Integer id);
 }
